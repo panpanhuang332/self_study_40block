@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>研究論文統計 · 40 段學習地圖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14232c;
+    --ink-2:#1d3540;
+    --paper:#f3f1e9;
+    --paper-2:#fbfaf5;
+    --text:#1e2b31;
+    --text-soft:#556570;
+    --line:#dcd8ca;
+    --jade:#17786b;
+    --jade-soft:#e6efeb;
+
+    /* 五層色碼：由淺入深、由冷到暖，代表學習的爬升 */
+    --l0:#6b7b88;  /* 第0層 研究語言 */
+    --l1:#1e8a94;  /* 第1層 變項設計 */
+    --l2:#2e9469;  /* 第2層 基礎統計 */
+    --l3:#c4881a;  /* 第3層 量表分析 */
+    --l4:#b04d34;  /* 第4層 進階模型 */
+    --lx:#3d4a63;  /* 論文整合 */
+
+    --radius:14px;
+    --shadow:0 1px 2px rgba(20,35,44,.05), 0 12px 32px -18px rgba(20,35,44,.28);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"Noto Sans TC",system-ui,sans-serif;
+    color:var(--text);
+    background:var(--paper);
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    text-underline-offset:3px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  .eyebrow{
+    font-family:"Space Grotesk",sans-serif;
+    font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;
+    font-weight:600;color:var(--jade);
+  }
+  .num{font-family:"Space Grotesk",sans-serif;font-feature-settings:"tnum";}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    background:var(--ink);
+    color:#eef2ee;
+    padding:76px 0 92px;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+    background-size:34px 34px;
+    mask-image:radial-gradient(ellipse 90% 70% at 70% 20%,#000 40%,transparent 100%);
+    pointer-events:none;
+  }
+  .hero .wrap{position:relative;}
+  .hero .eyebrow{color:#6fc7b6;}
+  .hero h1{
+    font-family:"Noto Serif TC",serif;font-weight:900;
+    font-size:clamp(2.1rem,5.6vw,3.6rem);
+    line-height:1.16;margin:.5em 0 .35em;letter-spacing:.01em;
+  }
+  .hero h1 .accent{color:#6fc7b6;}
+  .thesis{
+    font-size:clamp(1rem,2.2vw,1.22rem);
+    color:#c3ccc7;max-width:46ch;font-weight:300;
+  }
+  .thesis b{color:#eef2ee;font-weight:500;}
+  .stat-row{
+    display:flex;flex-wrap:wrap;gap:14px;margin-top:38px;
+  }
+  .stat{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:12px;padding:14px 20px;min-width:120px;
+  }
+  .stat .n{font-family:"Space Grotesk",sans-serif;font-size:1.9rem;font-weight:700;line-height:1;color:#fff;}
+  .stat .l{font-size:.8rem;color:#9fb0aa;margin-top:6px;letter-spacing:.04em;}
+
+  /* mini ladder in hero */
+  .mini-ladder{display:flex;gap:6px;margin-top:40px;flex-wrap:wrap;}
+  .mini-ladder .rung{
+    flex:1 1 130px;min-width:120px;
+    border-radius:10px;padding:12px 14px;color:#fff;
+    display:flex;flex-direction:column;gap:2px;
+    border:1px solid rgba(255,255,255,.14);
+  }
+  .mini-ladder .rung .lab{font-family:"Space Grotesk",sans-serif;font-size:.68rem;letter-spacing:.14em;opacity:.9;}
+  .mini-ladder .rung .nm{font-size:.94rem;font-weight:500;}
+
+  /* ---------- SECTION scaffolding ---------- */
+  section{padding:72px 0;}
+  .sec-head{max-width:60ch;margin-bottom:40px;}
+  .sec-head h2{
+    font-family:"Noto Serif TC",serif;font-weight:700;
+    font-size:clamp(1.5rem,3.4vw,2.1rem);
+    margin:.35em 0 .3em;line-height:1.3;
+  }
+  .sec-head p{color:var(--text-soft);margin:0;font-size:1.02rem;}
+
+  .alt{background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+
+  /* ---------- seven-part skeleton ---------- */
+  .skeleton{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .step{background:var(--paper-2);padding:22px 22px 24px;position:relative;}
+  .step .k{font-family:"Space Grotesk",sans-serif;font-size:.8rem;font-weight:700;color:var(--jade);letter-spacing:.1em;}
+  .step h4{margin:.5em 0 .3em;font-size:1.02rem;font-weight:700;}
+  .step p{margin:0;font-size:.9rem;color:var(--text-soft);}
+
+  .callout{
+    margin-top:26px;background:var(--jade-soft);border:1px solid #cfe0da;
+    border-left:4px solid var(--jade);border-radius:10px;
+    padding:18px 22px;font-size:.95rem;
+  }
+  .callout b{color:var(--jade);}
+
+  /* ---------- FLOW 1: layer map ---------- */
+  .ladder{display:flex;flex-direction:column;gap:0;}
+  .flowstep{
+    display:grid;grid-template-columns:112px 1fr;gap:0;align-items:stretch;
+  }
+  .flowstep .tag{
+    color:#fff;display:flex;flex-direction:column;justify-content:center;
+    padding:18px 16px;border-radius:12px 0 0 12px;
+  }
+  .flowstep .tag .lv{font-family:"Space Grotesk",sans-serif;font-size:.72rem;letter-spacing:.14em;opacity:.9;}
+  .flowstep .tag .big{font-family:"Space Grotesk",sans-serif;font-size:1.9rem;font-weight:700;line-height:1;}
+  .flowstep .body{
+    background:var(--paper-2);border:1px solid var(--line);border-left:none;
+    border-radius:0 12px 12px 0;padding:18px 22px;
+  }
+  .flowstep .body h4{margin:0 0 4px;font-size:1.08rem;font-weight:700;}
+  .flowstep .body p{margin:0;font-size:.92rem;color:var(--text-soft);}
+  .flowstep .body .units{margin-top:8px;font-size:.8rem;color:var(--jade);font-weight:500;letter-spacing:.02em;}
+  .connector{height:22px;display:flex;justify-content:flex-start;padding-left:52px;}
+  .connector span{width:2px;background:repeating-linear-gradient(var(--line) 0 4px,transparent 4px 8px);}
+
+  /* ---------- UNIT CARDS ---------- */
+  .units-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;}
+  .unit{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;
+    border-top:5px solid var(--uc,var(--jade));
+  }
+  .unit-head{padding:22px 24px 18px;}
+  .unit-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .chip-layer{
+    font-family:"Space Grotesk",sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.06em;
+    color:#fff;background:var(--uc,var(--jade));padding:3px 10px;border-radius:999px;
+  }
+  .chip-seg{
+    font-family:"Space Grotesk",sans-serif;font-size:.74rem;color:var(--text-soft);
+    background:var(--paper);border:1px solid var(--line);padding:2px 9px;border-radius:999px;
+  }
+  .unit h3{margin:0;font-family:"Noto Serif TC",serif;font-size:1.28rem;font-weight:700;line-height:1.35;}
+  .learn{
+    padding:0 24px 20px;margin-top:2px;
+  }
+  .learn .lead{
+    font-family:"Space Grotesk",sans-serif;font-size:.7rem;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--uc,var(--jade));font-weight:600;margin-bottom:6px;
+  }
+  .learn p{margin:0;font-size:.96rem;color:var(--text);line-height:1.72;}
+
+  .toggle{
+    margin-top:auto;width:100%;text-align:left;
+    background:var(--paper);border:none;border-top:1px solid var(--line);
+    padding:13px 24px;cursor:pointer;font-family:"Noto Sans TC",sans-serif;
+    font-size:.88rem;color:var(--text-soft);font-weight:500;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    transition:background .15s ease,color .15s ease;
+  }
+  .toggle:hover,.toggle:focus-visible{background:var(--jade-soft);color:var(--jade);outline:none;}
+  .toggle .arw{font-family:"Space Grotesk",sans-serif;transition:transform .25s ease;font-weight:700;}
+  .unit.open .toggle .arw{transform:rotate(90deg);}
+
+  .segs{display:none;padding:6px 24px 22px;background:var(--paper-2);border-top:1px dashed var(--line);}
+  .unit.open .segs{display:block;}
+  .seg{padding:15px 0;border-bottom:1px dashed var(--line);}
+  .seg:last-child{border-bottom:none;}
+  .seg-top{display:flex;gap:10px;align-items:baseline;}
+  .seg-n{
+    font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:.82rem;
+    color:#fff;background:var(--uc,var(--jade));border-radius:6px;
+    padding:1px 7px;flex:none;min-width:34px;text-align:center;
+  }
+  .seg-t{font-weight:700;font-size:.98rem;line-height:1.4;}
+  .seg-goal{font-size:.9rem;color:var(--text-soft);margin:6px 0 0 44px;}
+  .seg-foot{margin:8px 0 0 44px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .seg-page{
+    font-family:"Space Grotesk",sans-serif;font-size:.72rem;color:var(--jade);
+    background:var(--jade-soft);padding:1px 8px;border-radius:5px;
+  }
+  .seg-warn{font-size:.82rem;color:#9a4a2f;}
+  .seg-warn::before{content:"⚠ ";}
+
+  /* ---------- FLOW 2: decision tree ---------- */
+  .tree{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:30px 26px;box-shadow:var(--shadow);}
+  .tree .q0{
+    text-align:center;font-family:"Noto Serif TC",serif;font-weight:700;font-size:1.15rem;
+    background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;max-width:340px;margin:0 auto 6px;
+  }
+  .tree .stem{width:2px;height:20px;background:var(--line);margin:0 auto;}
+  .branch{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:6px;}
+  .col{border:1px solid var(--line);border-radius:12px;padding:18px 16px;background:var(--paper);}
+  .col > .qh{font-weight:700;text-align:center;margin-bottom:4px;font-size:1rem;}
+  .col > .qs{text-align:center;font-size:.82rem;color:var(--text-soft);margin-bottom:14px;}
+  .sub{display:flex;flex-direction:column;gap:12px;}
+  .qmini{font-size:.85rem;color:var(--text-soft);text-align:center;font-weight:500;}
+  .leaf{
+    display:flex;align-items:center;gap:12px;
+    border-radius:10px;padding:12px 15px;color:#fff;font-weight:600;
+    box-shadow:var(--shadow);
+  }
+  .leaf .cond{
+    font-family:"Space Grotesk",sans-serif;font-size:.74rem;
+    background:rgba(255,255,255,.22);padding:2px 8px;border-radius:6px;flex:none;
+  }
+  .leaf .m{font-size:1.02rem;}
+  .leaf .m small{display:block;font-weight:400;font-size:.75rem;opacity:.88;letter-spacing:.02em;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .tree-note{margin-top:18px;font-size:.86rem;color:var(--text-soft);text-align:center;}
+
+  /* ---------- checklist ---------- */
+  .check{list-style:none;padding:0;margin:0;display:grid;gap:12px;}
+  .check li{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--paper-2);border:1px solid var(--line);border-radius:10px;padding:15px 18px;
+  }
+  .check .box{
+    flex:none;width:22px;height:22px;border:2px solid var(--jade);border-radius:6px;margin-top:2px;
+    position:relative;
+  }
+  .check .box::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--jade);font-weight:700;font-size:.9rem;}
+  .check li span{font-size:.96rem;}
+
+  /* ---------- tools row ---------- */
+  .tools{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;}
+  .tools .t{
+    font-size:.86rem;background:var(--ink);color:#dfe6e2;
+    padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.1);
+  }
+  .tools .t b{color:#6fc7b6;font-family:"Space Grotesk",sans-serif;font-weight:600;}
+
+  /* ---------- footer ---------- */
+  footer{background:var(--ink);color:#9fb0aa;padding:40px 0;font-size:.86rem;}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:center;}
+  footer b{color:#eef2ee;font-family:"Noto Serif TC",serif;}
+
+  a.top{color:#6fc7b6;text-decoration:none;font-family:"Space Grotesk",sans-serif;font-size:.82rem;letter-spacing:.05em;}
+  a.top:hover{text-decoration:underline;}
+
+  /* ---------- responsive ---------- */
+  @media(max-width:640px){
+    section{padding:52px 0;}
+    .hero{padding:56px 0 66px;}
+    .branch{grid-template-columns:1fr;}
+    .flowstep{grid-template-columns:92px 1fr;}
+    .two{grid-template-columns:1fr;}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{scroll-behavior:auto !important;transition:none !important;}
+  }
+  /* ---------- print ---------- */
+  @media print{
+    body{background:#fff;}
+    .hero{background:#fff;color:#000;padding:20px 0;}
+    .hero::before{display:none;}
+    .hero .eyebrow,.hero h1 .accent{color:var(--jade);}
+    .thesis,.thesis b{color:#000;}
+    .stat,.mini-ladder{display:none;}
+    .toggle{display:none;}
+    .segs{display:block !important;}
+    section{padding:24px 0;page-break-inside:avoid;}
+    .unit{page-break-inside:avoid;box-shadow:none;}
+    footer{background:#fff;color:#000;}
+    a.top{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">研究論文統計 · 自學課程地圖</div>
+    <h1>先學<span class="accent">語言</span>，<br>再學<span class="accent">統計</span>。</h1>
+    <p class="thesis">統計方法只是回答研究問題的工具。<b>研究問題拆不清楚，方法一定選錯。</b>這門課用 40 段、由淺入深，帶完全不懂研究名詞的人，走完「研究問題 → 變項 → 方法 → 輸出 → 論文」一整條線。</p>
+
+    <div class="stat-row">
+      <div class="stat"><div class="n">40</div><div class="l">段獨立課程</div></div>
+      <div class="stat"><div class="n">8</div><div class="l">大學習單元</div></div>
+      <div class="stat"><div class="n">5</div><div class="l">層學習路線</div></div>
+      <div class="stat"><div class="n">40–50<span style="font-size:1rem">′</span></div><div class="l">每段建議時數</div></div>
+    </div>
+
+    <div class="mini-ladder" aria-hidden="true">
+      <div class="rung" style="background:var(--l0)"><span class="lab">LAYER 0</span><span class="nm">研究語言</span></div>
+      <div class="rung" style="background:var(--l1)"><span class="lab">LAYER 1</span><span class="nm">變項設計</span></div>
+      <div class="rung" style="background:var(--l2)"><span class="lab">LAYER 2</span><span class="nm">基礎統計</span></div>
+      <div class="rung" style="background:var(--l3)"><span class="lab">LAYER 3</span><span class="nm">量表分析</span></div>
+      <div class="rung" style="background:var(--l4)"><span class="lab">LAYER 4</span><span class="nm">進階模型</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== 七段式骨架 ===================== -->
+<section id="skeleton">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">貫穿全課的節奏</div>
+      <h2>每一堂方法課，都照同一套七段式骨架走</h2>
+      <p>全站每個統計方法頁都用同一結構。學生習慣節奏後，看到任何新方法都知道該問哪些問題——這也是「先破再立」教學法的骨幹。</p>
+    </div>
+
+    <div class="skeleton">
+      <div class="step"><div class="k">01</div><h4>回答什麼研究問題</h4><p>先給一個生活化例子切入。</p></div>
+      <div class="step"><div class="k">02</div><h4>需要什麼變項</h4><p>自變項／依變項各是什麼尺度。</p></div>
+      <div class="step"><div class="k">03</div><h4>何時能用 / 不能用</h4><p>方法的適用與不適用情境。</p></div>
+      <div class="step"><div class="k">04</div><h4>使用前要檢查什麼</h4><p>前提假設先過一遍。</p></div>
+      <div class="step"><div class="k">05</div><h4>輸出表怎麼看</h4><p>哪一欄最重要、要寫進論文。</p></div>
+      <div class="step"><div class="k">06</div><h4>常見錯誤（先破）</h4><p>破除迷思，再立正確做法。</p></div>
+      <div class="step"><div class="k">07</div><h4>論文範例句＋公式</h4><p>把數字寫成一句話。</p></div>
+    </div>
+
+    <div class="callout">
+      <b>現成評量：</b>全站附有 quiz / layer0–layer4 分層測驗與各層後測，每個單元結束可直接指派對應層級後測當課後評量，不必另出題。
+    </div>
+
+    <div class="tools">
+      <span class="t"><b>工具</b>&nbsp;方法推薦器 recommender</span>
+      <span class="t"><b>工具</b>&nbsp;輸出表判讀 output-guide</span>
+      <span class="t"><b>工具</b>&nbsp;錯誤診療室 error-clinic</span>
+      <span class="t"><b>工具</b>&nbsp;案例庫 cases</span>
+      <span class="t"><b>工具</b>&nbsp;工具比較 tools</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 流程圖 1：五層學習地圖 ===================== -->
+<section id="map" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">學習流程圖 ①</div>
+      <h2>五層學習地圖：一階一階往上爬</h2>
+      <p>顏色是全站的導航系統——同一個層級的顏色，會跟著出現在下方的單元卡與方法決策樹裡。愈往上，變項愈抽象、模型愈進階。</p>
+    </div>
+
+    <div class="ladder">
+      <div class="flowstep">
+        <div class="tag" style="background:var(--l0)"><span class="lv">LAYER 0</span><span class="big">語言</span></div>
+        <div class="body">
+          <h4>研究語言：先聽得懂研究在講什麼</h4>
+          <p>變項、自變項／依變項、構面／題項、樣本／母體、連續 vs 類別——這些名詞決定後面所有方法選擇。</p>
+          <div class="units">單元一 · 第 1–4 段</div>
+        </div>
+      </div>
+      <div class="connector"><span></span></div>
+
+      <div class="flowstep">
+        <div class="tag" style="background:var(--l1)"><span class="lv">LAYER 1</span><span class="big">設計</span></div>
+        <div class="body">
+          <h4>研究問題與變項設計</h4>
+          <p>把口語疑問改寫成可被資料回答的研究問題，定位三種變項、寫方向性假設、畫研究架構圖。</p>
+          <div class="units">單元二 · 第 5–9 段</div>
+        </div>
+      </div>
+      <div class="connector"><span></span></div>
+
+      <div class="flowstep">
+        <div class="tag" style="background:var(--l2)"><span class="lv">LAYER 2</span><span class="big">統計</span></div>
+        <div class="body">
+          <h4>基礎統計方法：描述 · 差異 · 關聯迴歸</h4>
+          <p>課程的核心地帶。先描述資料，再做差異檢定（t／ANOVA／卡方），最後從關係走向預測（相關／迴歸）。</p>
+          <div class="units">單元三、四、五 · 第 10–26 段</div>
+        </div>
+      </div>
+      <div class="connector"><span></span></div>
+
+      <div class="flowstep">
+        <div class="tag" style="background:var(--l3)"><span class="lv">LAYER 3</span><span class="big">量表</span></div>
+        <div class="body">
+          <h4>問卷研究與量表分析</h4>
+          <p>完整問卷流程、資料清理、Likert 量表、信度（Cronbach's α）與探索性因素分析 EFA。</p>
+          <div class="units">單元六 · 第 27–33 段</div>
+        </div>
+      </div>
+      <div class="connector"><span></span></div>
+
+      <div class="flowstep">
+        <div class="tag" style="background:var(--l4)"><span class="lv">LAYER 4</span><span class="big">進階</span></div>
+        <div class="body">
+          <h4>進階模型：中介 · 調節 · CFA · SEM</h4>
+          <p>進入潛在變項世界，檢驗機制與量表效度，用結構方程整合測量與結構模型。</p>
+          <div class="units">單元七 · 第 34–37 段</div>
+        </div>
+      </div>
+      <div class="connector"><span></span></div>
+
+      <div class="flowstep">
+        <div class="tag" style="background:var(--lx)"><span class="lv">FINAL</span><span class="big">整合</span></div>
+        <div class="body">
+          <h4>論文寫作與整合</h4>
+          <p>把統計輸出寫成論文句、破除四大迷思、用綜合案例把 39 段串成一條完整研究線。</p>
+          <div class="units">單元八 · 第 38–40 段</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 八大單元 ===================== -->
+<section id="units">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">課程結構</div>
+      <h2>八大單元：每個單元主要學什麼</h2>
+      <p>每張卡片先給一句「主要學什麼」，點開就能看到該單元每一段的學習目標與要先破除的常見錯誤。</p>
+    </div>
+
+    <div class="units-grid">
+
+      <!-- 單元一 -->
+      <article class="unit" style="--uc:var(--l0)">
+        <div class="unit-head">
+          <div class="unit-meta"><span class="chip-layer">第 0 層</span><span class="chip-seg">第 1–4 段</span></div>
+          <h3>單元一 · 課程導論與研究語言</h3>
+        </div>
+        <div class="learn">
+          <div class="lead">主要學什麼</div>
+          <p>建立研究語言的地基：認識五層學習地圖，分辨研究問題／變項、自變項／依變項、構面／題項、樣本／母體，以及<strong>連續 vs 類別變項</strong>——這一刀決定後面所有方法怎麼選。</p>
+        </div>
+        <button class="toggle" aria-expanded="false">展開 4 段課程明細<span class="arw">›</span></button>
+        <div class="segs">
+          <div class="seg"><div class="seg-top"><span class="seg-n">01</span><span class="seg-t">課程總覽與五層學習地圖</span></div><p class="seg-goal">理解「先學語言，再學統計」的邏輯，認識五層路線與自己的起點。</p><div class="seg-foot"><span class="seg-page">learning-path</span><span class="seg-warn">把「很大的題目」當研究問題</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">02</span><span class="seg-t">研究語言（一）：問題、變項、自變項、依變項</span></div><p class="seg-goal">分辨生活疑問與研究問題，指認一句話裡的自變項與依變項。</p><div class="seg-foot"><span class="seg-page">research-language</span><span class="seg-warn">不是所有名詞都是變項</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">03</span><span class="seg-t">研究語言（二）：控制變項、構面、題項、樣本、母體</span></div><p class="seg-goal">理解構面與題項的階層關係，分辨樣本與母體。</p><div class="seg-foot"><span class="seg-page">research-language</span><span class="seg-warn">把單一題項當整個構面／樣本過度推論到母體</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">04</span><span class="seg-t">研究語言（三）：連續 vs 類別、測量尺度</span></div><p class="seg-goal">判斷變項是連續還是類別——這決定後面所有方法選擇。</p><div class="seg-foot"><span class="seg-page">research-language · descriptive-statistics</span><span class="seg-warn">把類別編碼直接拿去算平均</span></div></div>
+        </div>
+      </article>
+
+      <!-- 單元二 -->
+      <article class="unit" style="--uc:var(--l1)">
+        <div class="unit-head">
+          <div class="unit-meta"><span class="chip-layer">第 1 層</span><span class="chip-seg">第 5–9 段</span></div>
+          <h3>單元二 · 研究問題與變項設計</h3>
+        </div>
+        <div class="learn">
+          <div class="lead">主要學什麼</div>
+          <p>把日常疑問變成<strong>可被資料回答</strong>的研究問題：用三個自問句定位自變項／依變項／控制變項，完成變項拆解表，寫出方向性假設，並用箭頭畫出研究架構圖。</p>
+        </div>
+        <button class="toggle" aria-expanded="false">展開 5 段課程明細<span class="arw">›</span></button>
+        <div class="segs">
+          <div class="seg"><div class="seg-top"><span class="seg-n">05</span><span class="seg-t">從日常疑問到研究問題</span></div><p class="seg-goal">把口語問題改寫成有對象、有變項、可收資料的研究問題。</p><div class="seg-foot"><span class="seg-page">research-variables</span><span class="seg-warn">題目沒有變項，無法決定分析方法</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">06</span><span class="seg-t">找出自變項、依變項、控制變項</span></div><p class="seg-goal">用三個自問句定位三種變項。</p><div class="seg-foot"><span class="seg-page">research-variables</span><span class="seg-warn">漏掉控制變項，把假關係當真關係</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">07</span><span class="seg-t">變項拆解表格實作</span></div><p class="seg-goal">完成「研究問題 → 三種變項 → 可能統計方法」一整列。</p><div class="seg-foot"><span class="seg-page">research-variables</span><span class="seg-warn">方法欄先猜即可，正確與否留到單元四驗證</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">08</span><span class="seg-t">從研究問題寫出研究假設</span></div><p class="seg-goal">把研究問題改寫成有方向的預期。</p><div class="seg-foot"><span class="seg-page">research-variables</span><span class="seg-warn">假設沒有方向、或無法用資料檢驗</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">09</span><span class="seg-t">研究架構圖：用箭頭畫出變項關係</span></div><p class="seg-goal">把一句話畫成研究架構圖。</p><div class="seg-foot"><span class="seg-page">research-variables · research-map</span><span class="seg-warn">箭頭方向與假設不一致</span></div></div>
+        </div>
+      </article>
+
+      <!-- 單元三 -->
+      <article class="unit" style="--uc:var(--l2)">
+        <div class="unit-head">
+          <div class="unit-meta"><span class="chip-layer">第 2 層</span><span class="chip-seg">第 10–13 段</span></div>
+          <h3>單元三 · 資料整理與描述統計</h3>
+        </div>
+        <div class="learn">
+          <div class="lead">主要學什麼</div>
+          <p>任何正式分析前的第一步：用 <strong>M／SD</strong>（連續）與<strong>次數／百分比</strong>（類別）整理資料，讀懂描述統計表哪一欄最重要、寫成論文句，並在分析前抓出不合理值與遺漏值。</p>
+        </div>
+        <button class="toggle" aria-expanded="false">展開 4 段課程明細<span class="arw">›</span></button>
+        <div class="segs">
+          <div class="seg"><div class="seg-top"><span class="seg-n">10</span><span class="seg-t">資料長什麼樣子：描述統計的角色</span></div><p class="seg-goal">知道任何正式分析前都要先做描述統計。</p><div class="seg-foot"><span class="seg-page">descriptive-statistics</span><span class="seg-warn">以為描述統計可以下結論</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">11</span><span class="seg-t">集中趨勢與離散：M、SD、次數與百分比</span></div><p class="seg-goal">連續變項看 M 與 SD，類別變項看次數與百分比。</p><div class="seg-foot"><span class="seg-page">descriptive-statistics</span><span class="seg-warn">只報平均數沒報標準差</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">12</span><span class="seg-t">描述統計的輸出判讀與論文寫法</span></div><p class="seg-goal">知道描述統計表哪一欄最重要、哪些要寫進論文。</p><div class="seg-foot"><span class="seg-page">descriptive-statistics · output-guide</span><span class="seg-warn">把類別代碼（科系 1、2、3）拿去算平均</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">13</span><span class="seg-t">描述統計常見錯誤與資料檢查</span></div><p class="seg-goal">能在分析前抓出不合理值與遺漏值。</p><div class="seg-foot"><span class="seg-page">descriptive-statistics</span><span class="seg-warn">沒清理就開始解讀</span></div></div>
+        </div>
+      </article>
+
+      <!-- 單元四 -->
+      <article class="unit" style="--uc:var(--l2)">
+        <div class="unit-head">
+          <div class="unit-meta"><span class="chip-layer">第 2 層</span><span class="chip-seg">第 14–20 段</span></div>
+          <h3>單元四 · 差異檢定</h3>
+        </div>
+        <div class="learn">
+          <div class="lead">主要學什麼</div>
+          <p>用「<strong>自變項尺度 × 依變項尺度 × 組數</strong>」選方法：兩組平均用 t 檢定、三組以上用 ANOVA（＋事後比較）、類別對類別用卡方。讀懂輸出、寫結果句，並破除「多次 t 檢定取代 ANOVA」的錯誤。</p>
+        </div>
+        <button class="toggle" aria-expanded="false">展開 7 段課程明細<span class="arw">›</span></button>
+        <div class="segs">
+          <div class="seg"><div class="seg-top"><span class="seg-n">14</span><span class="seg-t">方法選擇總覽：我該跑什麼統計？</span></div><p class="seg-goal">用「自變項 × 依變項 × 組數」快速定位方法（全課導航頁）。</p><div class="seg-foot"><span class="seg-page">recommender · learning-path</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">15</span><span class="seg-t">t 檢定（一）：兩組比較的邏輯與前提</span></div><p class="seg-goal">知道 t 檢定回答「兩組平均數有沒有不同」。</p><div class="seg-foot"><span class="seg-page">t-test</span><span class="seg-warn">把三組以上用 t 檢定反覆兩兩比較</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">16</span><span class="seg-t">t 檢定（二）：獨立／成對、Welch、效果量</span></div><p class="seg-goal">看懂 t、df、p、Cohen's d，判斷該用哪種 t。</p><div class="seg-foot"><span class="seg-page">t-test</span><span class="seg-warn">只看 p 值沒報組別平均數</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">17</span><span class="seg-t">單因子 ANOVA（一）：三組以上與 F 檢定</span></div><p class="seg-goal">知道 ANOVA 回答「三組以上是否至少有一組不同」。</p><div class="seg-foot"><span class="seg-page">anova</span><span class="seg-warn">用多次 t 檢定取代 ANOVA（膨脹型一誤差）</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">18</span><span class="seg-t">單因子 ANOVA（二）：事後比較與效果量</span></div><p class="seg-goal">F 顯著只代表至少一組不同，要靠 post hoc 指出哪幾組。</p><div class="seg-foot"><span class="seg-page">anova</span><span class="seg-warn">ANOVA 顯著後沒做事後比較就說「所有組都不同」</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">19</span><span class="seg-t">卡方檢定：類別對類別的關聯</span></div><p class="seg-goal">用卡方看兩個類別變項是否有關聯／獨立。</p><div class="seg-foot"><span class="seg-page">chi-square</span><span class="seg-warn">把連續變項硬切成類別再跑卡方</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">20</span><span class="seg-t">差異檢定綜合演練與輸出判讀</span></div><p class="seg-goal">拿到題目能自己決定 t／ANOVA／卡方並讀對輸出。</p><div class="seg-foot"><span class="seg-page">output-guide</span><span class="seg-warn">單元評量：指派 quiz/layer2 後測</span></div></div>
+        </div>
+      </article>
+
+      <!-- 單元五 -->
+      <article class="unit" style="--uc:var(--l2)">
+        <div class="unit-head">
+          <div class="unit-meta"><span class="chip-layer">第 2 層</span><span class="chip-seg">第 21–26 段</span></div>
+          <h3>單元五 · 關聯與迴歸</h3>
+        </div>
+        <div class="learn">
+          <div class="lead">主要學什麼</div>
+          <p>從「關係」走向「<strong>預測</strong>」：讀懂相關係數與「相關 ≠ 因果」，理解簡單／多元迴歸、標準化係數 β、共線性與虛擬變項，最後把迴歸輸出寫成論文結果段。</p>
+        </div>
+        <button class="toggle" aria-expanded="false">展開 6 段課程明細<span class="arw">›</span></button>
+        <div class="segs">
+          <div class="seg"><div class="seg-top"><span class="seg-n">21</span><span class="seg-t">相關分析（一）：相關係數的意義與方向</span></div><p class="seg-goal">讀懂相關係數的正負與強弱。</p><div class="seg-foot"><span class="seg-page">correlation</span><span class="seg-warn">把弱相關過度解讀成「有關係」</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">22</span><span class="seg-t">相關分析（二）：相關 ≠ 因果</span></div><p class="seg-goal">用正確字眼描述相關結果（相關／關聯／預測，非造成／導致）。</p><div class="seg-foot"><span class="seg-page">correlation · error-clinic</span><span class="seg-warn">把相關寫成因果</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">23</span><span class="seg-t">簡單迴歸：一個自變項預測依變項</span></div><p class="seg-goal">理解迴歸從「關係」走向「預測」，讀懂斜率與 R²。</p><div class="seg-foot"><span class="seg-page">simple-regression</span><span class="seg-warn">把 R² 誤讀成因果強度</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">24</span><span class="seg-t">多元迴歸（一）：多預測變項、R²、標準化係數</span></div><p class="seg-goal">讀懂多個自變項同時預測時的標準化係數 β。</p><div class="seg-foot"><span class="seg-page">multiple-regression</span><span class="seg-warn">只看顯著性不看 β 大小與方向</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">25</span><span class="seg-t">多元迴歸（二）：前提診斷與虛擬變項</span></div><p class="seg-goal">檢查共線性與殘差，用 dummy variable 放入類別變項。</p><div class="seg-foot"><span class="seg-page">multiple-regression</span><span class="seg-warn">把類別變項直接當連續丟進迴歸</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">26</span><span class="seg-t">迴歸結果的論文寫法與整合演練</span></div><p class="seg-goal">把迴歸輸出寫成論文結果段（先整體模型、再個別預測變項）。</p><div class="seg-foot"><span class="seg-page">multiple-regression · writing-templates</span><span class="seg-warn">漏報 R² 或整體模型檢定</span></div></div>
+        </div>
+      </article>
+
+      <!-- 單元六 -->
+      <article class="unit" style="--uc:var(--l3)">
+        <div class="unit-head">
+          <div class="unit-meta"><span class="chip-layer">第 3 層</span><span class="chip-seg">第 27–33 段</span></div>
+          <h3>單元六 · 問卷研究與量表分析</h3>
+        </div>
+        <div class="learn">
+          <div class="lead">主要學什麼</div>
+          <p>掌握完整問卷流程（Step 1–10）：從文獻把概念拆成構面題項、做資料清理（<strong>反向題、遺漏值、構面分數</strong>）、正確使用 Likert 量表，再做信度分析（Cronbach's α）與探索性因素分析 EFA。</p>
+        </div>
+        <button class="toggle" aria-expanded="false">展開 7 段課程明細<span class="arw">›</span></button>
+        <div class="segs">
+          <div class="seg"><div class="seg-top"><span class="seg-n">27</span><span class="seg-t">問卷研究流程總覽（Step 1–10）</span></div><p class="seg-goal">掌握「研究問題 → 構面題項 → 收資料 → 清理 → 信效度 → 假設檢定」全流程。</p><div class="seg-foot"><span class="seg-page">survey-research</span><span class="seg-warn">題目太大還沒有變項</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">28</span><span class="seg-t">構面與題項設計：從概念到可測量</span></div><p class="seg-goal">用文獻把抽象概念拆成構面，再寫成題項。</p><div class="seg-foot"><span class="seg-page">survey-research</span><span class="seg-warn">自己亂編構面、沒有文獻支撐</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">29</span><span class="seg-t">問卷資料清理實戰（一）：命名、編碼、反向題</span></div><p class="seg-goal">完成下載後前四步清理，正確做反向計分（6 − 原分數）。</p><div class="seg-foot"><span class="seg-page">survey-cleaning</span><span class="seg-warn">反向題沒轉換會拉低信度、甚至讓方向錯誤</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">30</span><span class="seg-t">問卷資料清理實戰（二）：無效問卷、遺漏值、構面分數</span></div><p class="seg-goal">處理無效問卷與遺漏值，建立構面分數。</p><div class="seg-foot"><span class="seg-page">survey-cleaning</span><span class="seg-warn">把未清理資料直接丟去跑分析</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">31</span><span class="seg-t">Likert 量表與測量尺度的正確使用</span></div><p class="seg-goal">理解 Likert 量表的尺度性質與加總方式。</p><div class="seg-foot"><span class="seg-page">survey-research</span><span class="seg-warn">把單題當成整個構面下結論</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">32</span><span class="seg-t">信度分析：Cronbach's α 與項目總相關</span></div><p class="seg-goal">判讀 α 與修正後項目總相關，決定是否刪題。</p><div class="seg-foot"><span class="seg-page">reliability-analysis · output-guide</span><span class="seg-warn">只因刪題後 α 變高就亂刪題</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">33</span><span class="seg-t">探索性因素分析 EFA：量表結構的萃取</span></div><p class="seg-goal">理解 EFA 在整理量表結構、找出構面（是探索不是驗證）。</p><div class="seg-foot"><span class="seg-page">efa</span><span class="seg-warn">EFA 跑完就說「量表已被驗證」</span></div></div>
+        </div>
+      </article>
+
+      <!-- 單元七 -->
+      <article class="unit" style="--uc:var(--l4)">
+        <div class="unit-head">
+          <div class="unit-meta"><span class="chip-layer">第 4 層</span><span class="chip-seg">第 34–37 段</span></div>
+          <h3>單元七 · 進階模型</h3>
+        </div>
+        <div class="learn">
+          <div class="lead">主要學什麼</div>
+          <p>進入潛在變項世界：<strong>中介</strong>（X 透過 M 影響 Y）、<strong>調節</strong>（關係何時改變）、<strong>CFA</strong>（驗證量表結構）與 <strong>SEM</strong>（同時處理測量＋結構模型），並理解機制檢驗與效度驗證的分工。</p>
+        </div>
+        <button class="toggle" aria-expanded="false">展開 4 段課程明細<span class="arw">›</span></button>
+        <div class="segs">
+          <div class="seg"><div class="seg-top"><span class="seg-n">34</span><span class="seg-t">中介效果 Mediation：機制的檢驗</span></div><p class="seg-goal">理解「X 透過 M 影響 Y」的中介邏輯與直接／間接效果。</p><div class="seg-foot"><span class="seg-page">mediation</span><span class="seg-warn">沒有理論就宣稱中介</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">35</span><span class="seg-t">調節效果 Moderation：關係何時會改變</span></div><p class="seg-goal">理解調節變項如何改變 X→Y 的強度或方向。</p><div class="seg-foot"><span class="seg-page">moderation</span><span class="seg-warn">把調節與中介混為一談</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">36</span><span class="seg-t">驗證性因素分析 CFA：量表效度驗證</span></div><p class="seg-goal">理解 CFA 用來驗證既有量表結構（與 EFA 對照）。</p><div class="seg-foot"><span class="seg-page">cfa</span><span class="seg-warn">同一批資料先 EFA 再 CFA 卻不切分樣本</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">37</span><span class="seg-t">結構方程模型 SEM：整合測量與結構</span></div><p class="seg-goal">理解 SEM 同時處理測量模型＋結構模型，可檢驗多條路徑。</p><div class="seg-foot"><span class="seg-page">sem</span><span class="seg-warn">樣本太小硬跑 SEM；適配不佳仍強解讀</span></div></div>
+        </div>
+      </article>
+
+      <!-- 單元八 -->
+      <article class="unit" style="--uc:var(--lx)">
+        <div class="unit-head">
+          <div class="unit-meta"><span class="chip-layer">整合</span><span class="chip-seg">第 38–40 段</span></div>
+          <h3>單元八 · 論文寫作與整合</h3>
+        </div>
+        <div class="learn">
+          <div class="lead">主要學什麼</div>
+          <p>把統計輸出<strong>寫進論文</strong>：各分析的固定句型模板、破除四大迷思的錯誤診療室，最後用一個綜合案例，從研究問題到論文結果走完整一遍。</p>
+        </div>
+        <button class="toggle" aria-expanded="false">展開 3 段課程明細<span class="arw">›</span></button>
+        <div class="segs">
+          <div class="seg"><div class="seg-top"><span class="seg-n">38</span><span class="seg-t">統計結果怎麼寫進論文：句型模板</span></div><p class="seg-goal">把各種分析輸出轉成論文結果章句型（先整體、再細節）。</p><div class="seg-foot"><span class="seg-page">writing-templates</span><span class="seg-warn">把類別編碼當平均數解釋</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">39</span><span class="seg-t">常見錯誤診療室：破除四大迷思</span></div><p class="seg-goal">辨識並修正 p 值迷思、相關寫成因果、無信度就跑迴歸、EFA 當驗證。</p><div class="seg-foot"><span class="seg-page">error-clinic</span><span class="seg-warn">本段即以「抓錯並改寫」為評量</span></div></div>
+          <div class="seg"><div class="seg-top"><span class="seg-n">40</span><span class="seg-t">綜合案例：從研究問題到論文結果走一遍</span></div><p class="seg-goal">把 39 段內容串成一條完整研究線，做期末發表。</p><div class="seg-foot"><span class="seg-page">cases · 全站整合</span><span class="seg-warn">期末總評：方法選對＋輸出讀對＋句子寫對</span></div></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 流程圖 2：方法決策樹 ===================== -->
+<section id="decision" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">學習流程圖 ②</div>
+      <h2>統計方法選擇決策樹（第 14 段核心）</h2>
+      <p>整門課的「導航邏輯」。之後每次要選方法，都回到這張圖：先看依變項是什麼尺度，再看自變項與組數。</p>
+    </div>
+
+    <div class="tree">
+      <div class="q0">我該跑什麼統計？</div>
+      <div class="stem"></div>
+      <div class="qmini" style="margin-bottom:10px;">先問：<strong>依變項</strong>是什麼尺度？</div>
+
+      <div class="branch">
+        <!-- 左：依變項連續 -->
+        <div class="col">
+          <div class="qh">依變項是<span style="color:var(--l2)">連續</span></div>
+          <div class="qs">（分數、時數、滿意度…）　再問自變項</div>
+          <div class="sub">
+            <div class="qmini">自變項是<strong>類別</strong> → 看組數</div>
+            <div class="two">
+              <div class="leaf" style="background:var(--l2)"><span class="cond">2 組</span><span class="m">t 檢定<small>兩組平均比較</small></span></div>
+              <div class="leaf" style="background:var(--l2)"><span class="cond">3 組＋</span><span class="m">ANOVA<small>＋事後比較</small></span></div>
+            </div>
+            <div class="qmini" style="margin-top:6px;">自變項是<strong>連續</strong></div>
+            <div class="leaf" style="background:var(--l4)"><span class="cond">連續×連續</span><span class="m">相關 / 迴歸<small>從關係走向預測</small></span></div>
+          </div>
+        </div>
+
+        <!-- 右：依變項類別 -->
+        <div class="col">
+          <div class="qh">依變項是<span style="color:var(--l1)">類別</span></div>
+          <div class="qs">（是否再購、是否使用…）　再問自變項</div>
+          <div class="sub">
+            <div class="qmini">自變項也是<strong>類別</strong></div>
+            <div class="leaf" style="background:var(--l1)"><span class="cond">類別×類別</span><span class="m">卡方檢定<small>看兩類別是否關聯／獨立</small></span></div>
+            <div class="qmini" style="margin-top:6px;color:var(--text-soft);opacity:.75;">＊類別依變項＋連續自變項的預測問題<br>屬進階（如邏輯迴歸），本課先聚焦上述四種主力方法。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tree-note">用「<strong>自變項尺度 × 依變項尺度 × 組數</strong>」三個問題，就能定位課程裡的主力方法。線上「方法推薦器 recommender」即是這張決策樹的互動版。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 備課檢核表 ===================== -->
+<section id="checklist">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">附錄</div>
+      <h2>備課檢核表</h2>
+      <p>每次備課前後對一遍，維持全課一致的節奏與品質。</p>
+    </div>
+    <ul class="check">
+      <li><span class="box"></span><span>每堂方法課都照「七段式骨架」進行，維持一致節奏。</span></li>
+      <li><span class="box"></span><span>每單元結束指派對應 <span class="num">quiz/layerN</span> 後測。</span></li>
+      <li><span class="box"></span><span>隨堂常回到「方法推薦器（第 14 段）」複習方法選擇邏輯。</span></li>
+      <li><span class="box"></span><span>「輸出表判讀」與「錯誤診療室」設為學生常備查表工具。</span></li>
+      <li><span class="box"></span><span>每段都準備一個生活化例子與一張真實輸出表，先破常見錯誤再立正確做法。</span></li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>教材來源：<b>研究論文統計自學網站</b>（research_self_study · Next.js 靜態站）　·　40 段 · 8 單元 · 5 層學習路線</div>
+    <a class="top" href="#">↑ 回到頂端</a>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var unit = btn.closest('.unit');
+      var open = unit.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var label = btn.childNodes[0];
+      var n = unit.querySelectorAll('.seg').length;
+      label.textContent = open ? ('收合課程明細') : ('展開 ' + n + ' 段課程明細');
+    });
+  });
+</script>
+</body>
+</html>
